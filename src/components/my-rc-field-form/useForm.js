@@ -1,29 +1,95 @@
+import React from 'react'
+
 export class FormStore {
   constructor() {
     this.store = {}
-    this.fieldEntries = []
+    this.fieldEntities = []
+    this.callbacks = []
   }
-  getFieldsValue() {
+  getFieldsValue = () => {
     return this.store
   }
-  getFieldValue(name) {
-    return this.store[name]
+  getFieldValue = (name) => {
+    return this.store[name] ?? ''
   }
-  setFieldValue(name, value) {
+  setFieldValue = (name, value) => {
+    if (value === this.store[name]) return
     this.store[name] = value
+    const entity = this.fieldEntities.find(entity => entity.props.name === name)
+    entity?.onStoreChange()
   }
-  registerFieldEntry(name, entry) {
-    this.store[name] = undefined
-    // if (this.fieldEntries.findIndex(item => item === entry) === -1) {
-    //   this.fieldEntries.push(entry)
-    // }
+  setFieldsValue = (newStore) => {
+    this.store = {...this.store, ...newStore}
+    this.fieldEntities.forEach((entity) => {
+      Object.keys(newStore).forEach((k) => {
+        if (k === entity.props.name) {
+          entity.onStoreChange();
+        }
+      });
+    });
+  }
+  registerFieldEntity = (entity) => {
+    this.fieldEntities.push(entity)
     return () => {
-      delete this.store[name]
-      // this.fieldEntries = this.fieldEntries.filter(item => item !== entry)  
+      delete this.store[entity.props.name]
+      this.fieldEntities = this.fieldEntities.filter(item => item !== entity)
     }
   }
+  validate = () => {
+    // 简单校验rule.required
+    const errorFields = []
+    this.fieldEntities.forEach(entity => {
+      const errorField = {
+        name: [entity.props.name],
+        errors: []
+      }
+      entity.props?.rules?.forEach(rule => {
+        if (rule.required && (this.store[entity.props.name] === "" || this.store[entity.props.name] === undefined)) {
+          errorField.errors.push(rule.message)
+        }
+      })
+      if (errorField.errors.length !== 0) {
+        errorFields.push(errorField)
+      }
+    })
+    return errorFields
+  }
+  submit = () => {
+    const { onFinish, onFinishFailed } = this.callbacks
+    const errorFields = this.validate()
+    if (errorFields.length === 0) {
+      onFinish && onFinish(this.store)
+    } else {
+      onFinishFailed && onFinishFailed({values: this.store, errorFields})
+    }
+  }
+  setCallbacks = (callbacks) => {
+    this.callbacks = {...this.callbacks, ...callbacks}
+  }
+
+  getForm = () => {
+    return {
+      getFieldsValue: this.getFieldsValue,
+      getFieldValue: this.getFieldValue,
+      setFieldsValue: this.setFieldsValue,
+      setFieldValue: this.setFieldValue,
+      registerFieldEntity: this.registerFieldEntity,
+      submit: this.submit,
+      setCallbacks: this.setCallbacks,
+    };
+  };
 }
 
-export function useForm() {
-  return [new FormStore()]
+export default function useForm(form) {
+  const formRef = React.useRef(null)
+  
+  if (!formRef.current) {
+    if (form) {
+      formRef.current = form
+    } else {
+      formRef.current = new FormStore().getForm()
+    }
+  }
+
+  return [formRef.current]
 }

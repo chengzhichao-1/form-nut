@@ -1,19 +1,27 @@
 import React, { useRef } from "react"
 import FieldContext from "./FieldContext";
-import { useForm } from "./useForm";
+import useForm from "./useForm";
 
-export default function Form({children, form}) {
+export default function Form({children, form, onFinish, onFinishFailed}, ref) {
   console.log("form children", children);
-  const formStore = useRef(useForm()[0])
+  const [formInstance] = useForm(form)
+
+  React.useImperativeHandle(ref, () => formInstance);
+
+  formInstance.setCallbacks({
+    onFinish,
+    onFinishFailed,
+  });
 
   const onSubmit = (e) => {
     e.preventDefault()
-    console.log("form state:", formStore.current.getFieldsValue());
+    formInstance.submit()
+    console.log("form state:", formInstance.getFieldsValue());
   }
   
   return (
     <form onSubmit={onSubmit}>
-      <FieldContext.Provider value={form ?? formStore.current}>
+      <FieldContext.Provider value={formInstance}>
         {children}
       </FieldContext.Provider>
     </form>

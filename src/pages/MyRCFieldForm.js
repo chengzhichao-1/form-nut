@@ -2,10 +2,16 @@ import React from "react";
 import Form, { Field } from "../components/my-rc-field-form";
 
 export default function MyRCFieldForm() {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
+
+  React.useEffect(() => {
+    console.log("form", form); //sy-log
+    form.setFieldsValue({ username: "default" });
+  }, []);
+
   return (
-    <Form>
-      <Field form={form} label="用户名" name="username">
+    <Form form={form}>
+      <Field label="用户名" name="username">
         <input placeholder="请输入用户名" />
       </Field>
       <Field label="密码" name="password">
