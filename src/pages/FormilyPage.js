@@ -1,6 +1,7 @@
-import {createForm} from "@formily/core";
-import {FormProvider, FormConsumer, Field} from "@formily/react";
-import {FormItem, Input, FormButtonGroup, Submit} from "@formily/antd";
+import { createForm } from "@formily/core";
+import { FormProvider, FormConsumer, Field } from "@formily/react";
+// import { FormItem, Input, FormButtonGroup, Submit } from "@formily/antd";
+import { FormItem, Input, Submit } from "../which";
 
 const form = createForm();
 
@@ -20,9 +21,9 @@ const FormilyPage = (props) => {
         <FormConsumer>
           {() => <div>实时响应：{form.values.input}</div>}
         </FormConsumer>
-        <FormButtonGroup>
-          <Submit onSubmit={console.log}>提交</Submit>
-        </FormButtonGroup>
+        {/* <FormButtonGroup> */}
+        <Submit onSubmit={console.log}>提交</Submit>
+        {/* </FormButtonGroup> */}
       </FormProvider>
     </div>
   );

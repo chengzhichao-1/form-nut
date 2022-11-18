@@ -2158,7 +2158,7 @@
     "@formily/validator" "2.2.12"
     hoist-non-react-statics "^3.3.2"
 
-"@formily/reactive-react@2.2.12":
+"@formily/reactive-react@2.2.12", "@formily/reactive-react@^2.2.12":
   version "2.2.12"
   resolved "https://registry.npmmirror.com/@formily/reactive-react/-/reactive-react-2.2.12.tgz#d0f04d2a47ac0c031a0499fd7afa95b18a4049ce"
   integrity sha512-jkH8j4q9Pw7Itppi6FF3YXF+J+GAMpWErfsmr8TlVsMBKs69hSP+Xet0CMrZga61bxMlq+UDylgQ7Dtuho57iA==
